@@ -176,6 +176,7 @@ else # if statement at the top - search for "FRAMEWORK_DIFF_IF_STATEMENT #2"
     echo "Cloning Dynamo repository..."
     rm -rf "$DYNAMO_PATH"
     if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
+        # TODO: before merge this will be a different branch off of main
         git clone --branch ishan/iter https://github.com/ai-dynamo/dynamo.git $DYNAMO_PATH
     else
         git clone --branch update-wait-for-model https://github.com/Elnifio/dynamo.git $DYNAMO_PATH
