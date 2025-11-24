@@ -8,6 +8,8 @@ set -x
 export SLURM_PARTITION="batch"
 export SLURM_ACCOUNT="benchmark"
 export SLURM_JOB_NAME="benchmark-dynamo.job"
+# For GB200 we have 4 GPUs per node
+export NTASKS_PER_NODE=4
 
 ### FRAMEWORK_DIFF_IF_STATEMENT #1 - difference in setting up envvars
 if [[ $FRAMEWORK == "dynamo-sglang" ]]; then
