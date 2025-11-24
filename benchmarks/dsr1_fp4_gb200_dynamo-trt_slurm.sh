@@ -68,12 +68,13 @@ sbatch --nodes=${total_nodes} \
 #     sleep 30
 # done
 
+# After sbatch submission
 echo "Waiting for all jobs to complete..."
 JOB_ID=$(squeue -u $USER --noheader --format='%i' | head -1)
 
 if [ -n "$JOB_ID" ]; then
-    # Tail the slurm output file
-    SLURM_LOG="slurm-${JOB_ID}.out"
+    # The slurm log is in the directory where sbatch was executed
+    SLURM_LOG="dynamo/components/backends/trtllm/performance_sweeps/slurm-${JOB_ID}.out"
     echo "Tailing ${SLURM_LOG}..."
     
     # Wait for log file to appear, then tail it
