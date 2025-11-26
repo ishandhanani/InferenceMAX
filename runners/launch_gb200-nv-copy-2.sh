@@ -45,26 +45,6 @@ done
 # Dynamo jobs are launched. In a follow-up PR, the location of the result file should not
 # depend on the runner, it should always be in the same spot in the GH workspace.
 
-# Find the logs directory (should be only one for this ISL/OSL combination)
-LOGS_DIR=$(find . -name "dynamo_disagg-bm-${ISL}-${OSL}" -type d | head -1)
-if [ -z "$LOGS_DIR" ]; then
-    echo "No logs directory found for ISL=${ISL}, OSL=${OSL}"
-    exit 1
-fi
-
-echo "Found logs directory: $LOGS_DIR"
-
-# Find all result subdirectories in this logs directory
-RESULT_SUBDIRS=$(find "$LOGS_DIR" -name "ctx*_gen*_[td]ep*_batch*_eplb*_mtp*" -type d)
-
-if [ -z "$RESULT_SUBDIRS" ]; then
-    echo "No result subdirectories found in $LOGS_DIR"
-    exit 1
-fi
-
-echo "Found result subdirectories:"
-echo "$RESULT_SUBDIRS"
-
 # Process results from all configurations
 if [[ $FRAMEWORK == "dynamo-trtllm" ]]; then
 
@@ -123,7 +103,6 @@ if [[ $FRAMEWORK == "dynamo-trtllm" ]]; then
             echo "Results subdirectory not found: $RESULTS_SUBDIR"
         fi
     done
-
 else # search for "FRAMEWORK_DIFF_IF_STATEMENT #3" for this if-statement
     # Find the latest log directory
     # we do "tail -1" here since only the latest job will yield the result
