@@ -43,6 +43,7 @@ class Fields(Enum):
     CONC = 'conc'
     MAX_MODEL_LEN = 'max-model-len'
     EXP_NAME = 'exp-name'
+    DISAGG = 'disagg'
 
 
 class SingleNodeMatrixEntry(BaseModel):
@@ -67,6 +68,7 @@ class SingleNodeMatrixEntry(BaseModel):
     conc: Union[int, List[int]]
     max_model_len: int = Field(alias=Fields.MAX_MODEL_LEN.value)
     exp_name: str = Field(alias=Fields.EXP_NAME.value)
+    disagg: bool
 
 
 class WorkerConfig(BaseModel):
@@ -101,6 +103,7 @@ class MultiNodeMatrixEntry(BaseModel):
     conc: List[int]
     max_model_len: int = Field(alias=Fields.MAX_MODEL_LEN.value)
     exp_name: str = Field(alias=Fields.EXP_NAME.value)
+    disagg: bool
 
 
 def validate_matrix_output(entry: dict, is_multinode: bool) -> dict:
@@ -236,6 +239,7 @@ class SingleNodeMasterConfigEntry(BaseModel):
     framework: str
     runner: str
     multinode: Literal[False]
+    disagg: bool = Field(default=False)
     seq_len_configs: List[SingleNodeSeqLenConfig] = Field(
         alias=Fields.SEQ_LEN_CONFIGS.value)
 
@@ -251,6 +255,7 @@ class MultiNodeMasterConfigEntry(BaseModel):
     framework: str
     runner: str
     multinode: Literal[True]
+    disagg: bool = Field(default=False)
     seq_len_configs: List[MultiNodeSeqLenConfig] = Field(
         alias=Fields.SEQ_LEN_CONFIGS.value)
 

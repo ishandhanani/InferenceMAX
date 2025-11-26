@@ -69,6 +69,8 @@ def generate_full_sweep(args, all_config_data, runner_data):
 
         # Check if this is a multinode config
         is_multinode = val.get(Fields.MULTINODE.value, False)
+        # Get disagg value, defaulting to False if not specified
+        disagg = val.get(Fields.DISAGG.value, False)
 
         seq_len_configs = val[Fields.SEQ_LEN_CONFIGS.value]
         image = val[Fields.IMAGE.value]
@@ -142,6 +144,7 @@ def generate_full_sweep(args, all_config_data, runner_data):
                         Fields.CONC.value: conc_values,  # Pass the entire list for multinode
                         Fields.MAX_MODEL_LEN.value: isl + osl + 200,
                         Fields.EXP_NAME.value: f"{model_code}_{seq_len_str}",
+                        Fields.DISAGG.value: disagg,
                     }
 
                     validate_matrix_output(entry, is_multinode)
@@ -185,6 +188,7 @@ def generate_full_sweep(args, all_config_data, runner_data):
                             Fields.EP.value: 1,  # Default
                             Fields.DP_ATTN.value: False,  # Default
                             Fields.EXP_NAME.value: f"{model_code}_{seq_len_str}",
+                            Fields.DISAGG.value: disagg,
                         }
 
                         if ep is not None:
@@ -234,6 +238,8 @@ def generate_runner_model_sweep_config(args, all_config_data, runner_data):
 
         # Get model code for exp_name
         model_code = val[Fields.MODEL_PREFIX.value]
+        # Get disagg value, defaulting to False if not specified
+        disagg = val.get(Fields.DISAGG.value, False)
 
         # Find 1k1k config
         target_config = None
@@ -269,6 +275,7 @@ def generate_runner_model_sweep_config(args, all_config_data, runner_data):
                 Fields.CONC.value: lowest_conc,
                 Fields.MAX_MODEL_LEN.value: 2048,
                 Fields.EXP_NAME.value: f"{model_code}_test",
+                Fields.DISAGG.value: disagg,
             }
 
             # Add optional fields if they exist

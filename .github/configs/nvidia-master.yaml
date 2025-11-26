@@ -334,6 +334,7 @@ dsr1-fp4-gb200-dynamo-trt:
   precision: fp4
   framework: dynamo-trt
   multinode: true
+  disagg: true
   seq-len-configs:
   - isl: 1024
     osl: 1024
@@ -795,6 +796,7 @@ dsr1-fp8-gb200-dynamo-sglang:
   precision: fp8
   framework: dynamo-sglang
   multinode: true
+  disagg: true
   seq-len-configs:
   - isl: 1024
     osl: 1024
