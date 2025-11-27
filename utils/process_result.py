@@ -63,7 +63,7 @@ if is_multinode:
     prefill_gpus = int(multinode_env['PREFILL_GPUS'])
     decode_gpus = int(multinode_env['DECODE_GPUS'])
     prefill_num_workers = int(multinode_env['PREFILL_NUM_WORKERS'])
-    prefill_tp = int(multinode_env['PREFILL_NUM_TP'])
+    prefill_tp = int(multinode_env['PREFILL_TP'])
     prefill_ep = int(multinode_env['PREFILL_EP'])
     prefill_dp_attn = multinode_env['PREFILL_DP_ATTN']
     decode_num_workers = int(multinode_env['DECODE_NUM_WORKERS'])
