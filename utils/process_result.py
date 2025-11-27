@@ -58,7 +58,7 @@ if is_multinode:
     # TODO: Eventually will have to have a separate condition in here for multinode disagg and
     # multinode agg. For now, just assume that multinode implies disagg.
 
-    multinode_env = get_required_env_vars(['PREFILL_GPUS', 'DECODE_GPUS', 'PREFILL_NUM_WORKERS', 'PREFILL_NUM_TP',
+    multinode_env = get_required_env_vars(['PREFILL_GPUS', 'DECODE_GPUS', 'PREFILL_NUM_WORKERS', 'PREFILL_TP',
                                           'PREFILL_EP', 'PREFILL_DP_ATTN', 'DECODE_NUM_WORKERS', 'DECODE_TP', 'DECODE_EP', 'DECODE_DP_ATTN'])
     prefill_gpus = int(multinode_env['PREFILL_GPUS'])
     decode_gpus = int(multinode_env['DECODE_GPUS'])
