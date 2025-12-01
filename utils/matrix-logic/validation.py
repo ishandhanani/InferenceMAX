@@ -55,8 +55,7 @@ class SingleNodeMatrixEntry(BaseModel):
     model: str
     precision: str
     framework: str
-    spec_decoding: Optional[Literal["mtp", "draft_model", "none"]] = Field(
-        default=None,
+    spec_decoding: Literal["mtp", "draft_model", "none"] = Field(
         alias=Fields.SPEC_DECODING.value
     )
     runner: str
@@ -171,8 +170,8 @@ class SingleNodeSearchSpaceEntry(BaseModel):
 
     tp: int
     ep: Optional[int] = None
-    spec_decoding: Optional[Literal["mtp", "draft_model", "none"]
-                  ] = Field(default=None, alias=Fields.SPEC_DECODING.value)
+    spec_decoding: Literal["mtp", "draft_model", "none"] = Field(
+        default="none", alias=Fields.SPEC_DECODING.value)
     dp_attn: Optional[bool] = Field(
         default=None, alias=Fields.DP_ATTN.value)
     conc_start: Optional[int] = Field(
@@ -192,8 +191,7 @@ class MultiNodeSearchSpaceEntry(BaseModel):
     model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     spec_decoding: Literal["mtp", "draft_model", "none"] = Field(
-        default="none",
-        alias=Fields.SPEC_DECODING.value)
+        default="none", alias=Fields.SPEC_DECODING.value)
     prefill: WorkerConfig
     decode: WorkerConfig
     conc_start: Optional[int] = Field(
@@ -277,19 +275,20 @@ def validate_master_config(master_configs: dict) -> List[dict]:
 
 # Runner Config Validation
 
+
 def validate_runner_config(runner_configs: dict) -> List[dict]:
     """Validate input master configuration structure."""
     for key, value in runner_configs.items():
         if not isinstance(value, list):
             raise ValueError(
                 f"Runner config entry '{key}' must be a list, got {type(value).__name__}")
-        
+
         if not all(isinstance(item, str) for item in value):
             raise ValueError(
                 f"Runner config entry '{key}' must contain only strings")
-        
+
         if not value:
             raise ValueError(
                 f"Runner config entry '{key}' cannot be an empty list")
-    
+
     return runner_configs

@@ -41,6 +41,12 @@ on:
       conc:
         required: true
         type: string
+      spec-decoding:
+        required: true
+        type: string
+      disagg:
+        required: true
+        type: string
       random-range-ratio:
         required: false
         type: string
@@ -62,6 +68,8 @@ env:
   EP_SIZE: ${{ inputs.ep }}
   DP_ATTENTION: ${{ inputs.dp-attn }}
   CONC: ${{ inputs.conc }}
+  SPEC_DECODING: ${{ inputs.spec-decoding }}
+  DISAGG: ${{ inputs.disagg }}
 
 permissions:
   contents: read

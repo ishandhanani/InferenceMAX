@@ -156,6 +156,7 @@ def generate_full_sweep(args, all_config_data, runner_data):
                     conc_end = bmk[Fields.CONC_END.value]
                     ep = bmk.get(Fields.EP.value)
                     dp_attn = bmk.get(Fields.DP_ATTN.value)
+                    spec_decoding = bmk.get(Fields.SPEC_DECODING.value, "none")
 
                     # Apply max-tp filter if specified
                     if args.max_tp and tp > args.max_tp:
@@ -187,6 +188,7 @@ def generate_full_sweep(args, all_config_data, runner_data):
                             Fields.MAX_MODEL_LEN.value: isl + osl + 200,
                             Fields.EP.value: 1,  # Default
                             Fields.DP_ATTN.value: False,  # Default
+                            Fields.SPEC_DECODING.value: spec_decoding,
                             Fields.EXP_NAME.value: f"{model_code}_{seq_len_str}",
                             Fields.DISAGG.value: disagg,
                         }
@@ -217,7 +219,7 @@ def generate_runner_model_sweep_config(args, all_config_data, runner_data):
 
     if not runner_nodes:
         raise ValueError(
-            f"Runner '{args.runner_type}' does not exist in runner config '{args.runner_config}'. Must choose from existing runner types: '{', '.join(runner_config.keys())}'.")
+            f"Runner '{args.runner_type}' does not exist in runner config '{args.runner_config}'. Must choose from existing runner types: '{', '.join(runner_data.keys())}'.")
 
     # Filter runner nodes if filter is specified
     if args.runner_node_filter:
@@ -269,6 +271,7 @@ def generate_runner_model_sweep_config(args, all_config_data, runner_data):
                 Fields.TP.value: highest_tp,
                 Fields.EP.value: 1,  # Default,
                 Fields.DP_ATTN.value: False,  # Default
+                Fields.SPEC_DECODING.value: "none",  # Default
                 Fields.CONC.value: lowest_conc,
                 Fields.MAX_MODEL_LEN.value: 2048,
                 Fields.EXP_NAME.value: f"{model_code}_test",
