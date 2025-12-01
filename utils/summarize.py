@@ -16,7 +16,7 @@ multinode_results = [r for r in results if r['is_multinode']]
 # Single-node and multi-node results have different field and therefore need to be printed separately
 if single_node_results:
     single_node_results.sort(key=lambda r: (
-        r['model'], r['hw'], r['framework'], r['precision'], r['isl'], r['osl'], r['tp'], r['ep'], r['conc']))
+        r['infmax_model_prefix'], r['hw'], r['framework'], r['precision'], r['isl'], r['osl'], r['tp'], r['ep'], r['conc']))
 
     print("## Single-Node Results\n")
     single_node_header = '''\
@@ -27,7 +27,7 @@ if single_node_results:
 
     for result in single_node_results:
         print(
-            f"| {result['model']} "
+            f"| {result['infmax_model_prefix']} "
             f"| {result['hw'].upper()} "
             f"| {result['framework'].upper()} "
             f"| {result['precision'].upper()} "
@@ -61,7 +61,7 @@ if multinode_results:
 
     for result in multinode_results:
         print(
-            f"| {result['model']} "
+            f"| {result['infmax_model_prefix']} "
             f"| {result['hw'].upper()} "
             f"| {result['framework'].upper()} "
             f"| {result['precision'].upper()} "
