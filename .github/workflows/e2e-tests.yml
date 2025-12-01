@@ -22,7 +22,19 @@ jobs:
               run: |
                   pip install pydantic
                   CONFIG_JSON=$(python3 ${GITHUB_WORKSPACE}/utils/matrix-logic/generate_sweep_configs.py ${{ inputs.generate-cli-command }})
+                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config) }}"
                   echo "search-space-config=$CONFIG_JSON" >> $GITHUB_OUTPUT
+
+    test:
+        runs-on: ubuntu-latest
+        needs: get-jobs
+        steps:
+            - id: get-jobs
+              run: |
+                  set -x 
+                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config) }}"
+                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config)[0] }}"
+                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config)[0].prefill }}"
 
     # test-sweep:
     #     needs: get-jobs
