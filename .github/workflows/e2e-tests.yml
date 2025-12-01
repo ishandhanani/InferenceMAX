@@ -27,43 +27,11 @@ jobs:
                     --config-files .github/configs/nvidia-master.yaml .github/configs/amd-master.yaml)
                   echo "search-space-config=$CONFIG_JSON" >> $GITHUB_OUTPUT
 
-    test:
-        runs-on: ubuntu-latest
-        needs: get-jobs
-        steps:
-            - id: get-jobs
-              run: |
-                  set -x 
-                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config) }}"
-                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config)[0] }}"
-                  echo "${{fromJson(needs.get-jobs.outputs.search-space-config)[0].prefill }}"
-
-    # test-sweep:
-    #     needs: get-jobs
-    #     uses: ./.github/workflows/benchmark-tmpl.yml
-    #     name: ${{ inputs.generate-cli-command }}
-    #     strategy:
-    #         fail-fast: false
-    #         matrix:
-    #             config: ${{ fromJson(needs.get-jobs.outputs.search-space-config) }}
-    #     secrets: inherit
-    #     with:
-    #         exp-name: ${{ matrix.config.exp-name }}
-    #         isl: ${{ matrix.config.isl }}
-    #         osl: ${{ matrix.config.osl }}
-    #         max-model-len: ${{ matrix.config.max-model-len }}
-    #         runner: ${{ matrix.config.runner }}
-    #         image: ${{ matrix.config.image }}
-    #         model: ${{ matrix.config.model }}
-    #         framework: ${{ matrix.config.framework }}
-    #         precision: ${{ matrix.config.precision }}
-    #         tp: ${{ matrix.config.tp }}
-    #         ep: ${{ matrix.config.ep }}
-    #         dp-attn: ${{ matrix.config.dp-attn }}
-    #         conc: ${{ matrix.config.conc }}
-
     test-sweep-multi-node:
         needs: get-jobs
+        # Use existence (or non-existence) of 'prefill' field as a proxy to determined multi-node tests.
+        # We only need to check the first entry because by design, all entries in the matrix will be of the same type (there will
+        # never be a mix of multi-node and single-node entries as output from generate_sweep_configs.py).
         if: ${{ needs.get-jobs.outputs.search-space-config != '[]' && fromJson(needs.get-jobs.outputs.search-space-config)[0].prefill != null }}
         uses: ./.github/workflows/benchmark-multinode-tmpl.yml
         name: ${{ inputs.generate-cli-command }} multi-node
@@ -73,9 +41,9 @@ jobs:
                 config: ${{ fromJson(needs.get-jobs.outputs.search-space-config) }}
         secrets: inherit
         with:
-            isl: 1024
-            osl: 1024
-            max-model-len: 2048
+            isl: ${{ matrix.config.isl }}
+            osl: ${{ matrix.config.osl }}
+            max-model-len: ${{ matrix.config.max-model-len }}
             runner: ${{ matrix.config.runner }}
             image: ${{ matrix.config.image }}
             model: ${{ matrix.config.model }}
@@ -123,41 +91,41 @@ jobs:
             dp-attn: ${{ matrix.config.dp-attn }}
             conc: ${{ matrix.config.conc }}
 
-    # collect-results:
-    #     needs: test-sweep
-    #     if: ${{ always() }}
-    #     uses: ./.github/workflows/collect-results.yml
-    #     secrets: inherit
+    collect-results:
+        needs: [test-sweep-multi-node, test-sweep-single-node]
+        if: ${{ always() }}
+        uses: ./.github/workflows/collect-results.yml
+        secrets: inherit
 
-    # calc-success-rate:
-    #     needs: collect-results
-    #     if: ${{ always() }}
-    #     runs-on: ubuntu-latest
+    calc-success-rate:
+        needs: collect-results
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
 
-    #     env:
-    #         RESULTS_DIR: "results/"
-    #         STATS_FILENAME: "run_stats"
-    #         GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
+        env:
+            RESULTS_DIR: "results/"
+            STATS_FILENAME: "run_stats"
+            GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
 
-    #     steps:
-    #         - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-    #           with:
-    #               token: ${{ secrets.REPO_PAT }}
-    #               fetch-depth: 0
+        steps:
+            - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              with:
+                  token: ${{ secrets.REPO_PAT }}
+                  fetch-depth: 0
 
-    #         - name: Download results artifacts
-    #           uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
-    #           with:
-    #               path: ${{ env.RESULTS_DIR }}
-    #               pattern: results_*
+            - name: Download results artifacts
+              uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+              with:
+                  path: ${{ env.RESULTS_DIR }}
+                  pattern: results_*
 
-    #         - name: Install python dependencies
-    #           run: pip install PyGithub
+            - name: Install python dependencies
+              run: pip install PyGithub
 
-    #         - name: Calculate success rate
-    #           run: python3 utils/calc_success_rate.py $STATS_FILENAME
+            - name: Calculate success rate
+              run: python3 utils/calc_success_rate.py $STATS_FILENAME
 
-    #         - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-    #           with:
-    #               name: "run-stats"
-    #               path: ${{ env.STATS_FILENAME }}.json
+            - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              with:
+                  name: "run-stats"
+                  path: ${{ env.STATS_FILENAME }}.json

@@ -167,7 +167,7 @@ jobs:
                 benchmark-dsr1-single-node,
                 benchmark-dsr1-multi-node,
             ]
-        if: ${{ always() && needs.get-dsr1-configs.result == 'success' }}
+        if: ${{ always() && needs.get-dsr1-configs.result == 'success' && needs.get-dsr1-configs.outputs.single-node-search-space-config != '[]' && needs.get-dsr1-configs.outputs.multi-node-search-space-config != '[]'  }}
         uses: ./.github/workflows/collect-results.yml
         secrets: inherit
         with:
@@ -180,7 +180,7 @@ jobs:
                 benchmark-gptoss-single-node,
                 benchmark-gptoss-multi-node,
             ]
-        if: ${{ always() && needs.get-gptoss-configs.result == 'success' }}
+        if: ${{ always() && needs.get-gptoss-configs.result == 'success' && needs.get-gptoss-configs.outputs.single-node-search-space-config != '[]' && needs.get-gptoss-configs.outputs.multi-node-search-space-config != '[]' }}
         uses: ./.github/workflows/collect-results.yml
         secrets: inherit
         with:
