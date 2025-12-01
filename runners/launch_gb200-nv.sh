@@ -13,7 +13,12 @@ export NTASKS_PER_NODE=4
 
 ### FRAMEWORK_DIFF_IF_STATEMENT #1 - difference in setting up envvars
 if [[ $FRAMEWORK == "dynamo-sglang" ]]; then
-    export IMAGE="/mnt/lustre01/artifacts/containers/dynamo-sglang.sqsh"
+    # Set IMAGE based on ISL/OSL
+    if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
+        export IMAGE="/mnt/lustre01/artifacts/containers/lmsysorg+sglang+v0.5.5.post2.sqsh"
+    else
+        export IMAGE="/mnt/lustre01/artifacts/containers/dynamo-sglang.sqsh"
+    fi
     export MODEL_PATH="/mnt/lustre01/models/deepseek-r1-0528"
     export CONFIG_DIR="/mnt/lustre01/artifacts/sglang-configs/1k1k"
 else
@@ -104,9 +109,22 @@ if [[ $FRAMEWORK == "dynamo-trt" ]]; then
         fi
     done
 else # search for "FRAMEWORK_DIFF_IF_STATEMENT #3" for this if-statement
-    # Find the latest log directory
-    # we do "tail -1" here since only the latest job will yield the result
-    LOGS_DIR=$(find . -path "*/logs/*/vllm_isl_${ISL}_osl_${OSL}" -type d 2>/dev/null | sort -V | tail -1)
+    # Find the latest log directory that contains the data
+    cat > collect_latest_results.py <<'PY'
+import os, sys
+isl, osl, nexp = [int(x) for x in sys.argv[1:]]
+for path in sorted([f"logs/{name}/vllm_isl_{isl}_osl_{osl}" for name in os.listdir("logs/") if os.path.isdir(f"logs/{name}/vllm_isl_{isl}_osl_{osl}")], key=os.path.getmtime, reverse=True)[:nexp]:
+    print(path)
+PY
+
+    # This isn't ideal but for now, this is needed for the collect_latest_results.py script
+    if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
+        NUMBER_OF_EXPERIMENTS=3
+    else
+        NUMBER_OF_EXPERIMENTS=1
+    fi
+
+    LOGS_DIR=$(python3 collect_latest_results.py $ISL $OSL $NUMBER_OF_EXPERIMENTS)
     if [ -z "$LOGS_DIR" ]; then
         echo "No logs directory found for ISL=${ISL}, OSL=${OSL}"
         exit 1

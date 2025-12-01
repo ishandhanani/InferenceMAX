@@ -12,8 +12,18 @@ check_env_vars CONC_LIST ISL OSL IMAGE SPEC_DECODING MODEL_PATH \
 
 # Always clone and setup Dynamo
 echo "Cloning Dynamo repository..."
-git clone --branch update-result-file-name https://github.com/Elnifio/dynamo.git
-cd "dynamo/components/backends/sglang/slurm_jobs"
+if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
+    git clone --branch ishan/sa-1.1-sgl-dsr1-fp8 https://github.com/ai-dynamo/dynamo.git
+else
+    git clone --branch update-result-file-name https://github.com/Elnifio/dynamo.git
+fi
+
+if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
+    SGL_SLURM_JOBS_PATH="dynamo/examples/backends/sglang/slurm_jobs"
+else
+    SGL_SLURM_JOBS_PATH="dynamo/components/backends/sglang/slurm_jobs"
+fi
+cd "$SGL_SLURM_JOBS_PATH"
 
 # Set up SGL launch script-specific environment variables
 export TIME_LIMIT="04:00:00"
