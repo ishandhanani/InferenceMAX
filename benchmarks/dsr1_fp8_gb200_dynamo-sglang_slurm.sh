@@ -12,11 +12,7 @@ check_env_vars CONC_LIST ISL OSL IMAGE SPEC_DECODING MODEL_PATH \
 
 # Always clone and setup Dynamo
 echo "Cloning Dynamo repository..."
-if [ "$ISL" = "1024" ] && [ "$OSL" = "1024" ]; then
-    git clone --branch ishan/sa-1.1-sgl-dsr1-fp8 https://github.com/ai-dynamo/dynamo.git
-else
-    git clone --branch update-result-file-name https://github.com/Elnifio/dynamo.git
-fi
+git clone --branch ishan/sa-1.1-sgl-dsr1 https://github.com/ai-dynamo/dynamo.git
 
 cd "$SGL_SLURM_JOBS_PATH"
 
